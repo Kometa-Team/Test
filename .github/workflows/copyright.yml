@@ -1,0 +1,22 @@
+name: Update Copyright Year
+
+on:
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Discord Failure Notification
+        uses: Kometa-Team/discord-notifications@master
+        with:
+          webhook_id_token: ${{ secrets.BUILD_WEBHOOK }}
+          message: Test
+          title: "Test: **Copyright Update Failed**"
+          url: https://github.com/Kometa-Team/Test/actions/runs/${{ github.run_id }}
+          color: 14879811
+          username: Kobota
+          avatar_url: https://raw.githubusercontent.com/Kometa-Team/Kometa/nightly/.github/logo.png
+          author: GitHub
+          author_icon_url: https://raw.githubusercontent.com/Kometa-Team/Kometa/nightly/.github/git.png
