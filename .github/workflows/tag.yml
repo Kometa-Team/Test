@@ -17,5 +17,6 @@ jobs:
 
       - uses: Kometa-Team/tag-new-version@master
         with:
+          tag-annotation-template: ""
           version-command: |
             cat VERSION

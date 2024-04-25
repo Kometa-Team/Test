@@ -1,7 +1,9 @@
 name: Update Copyright Year
 
 on:
-  workflow_dispatch:
+  create:
+    tags:
+      - v*
 
 jobs:
   update:
