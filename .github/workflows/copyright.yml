@@ -7,7 +7,7 @@ on:
 
 jobs:
   update:
-    if: ${{ startsWith(github.ref, 'refs/tags/v1') or startsWith(github.ref, 'refs/tags/v2') }}
+    if: ${{ startsWith(github.ref, 'refs/tags/v1') || startsWith(github.ref, 'refs/tags/v2') }}
     runs-on: ubuntu-latest
     steps:
 
