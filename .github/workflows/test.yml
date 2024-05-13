@@ -6,15 +6,16 @@ on:
 
 jobs:
 
-  docker:
+  changes:
     runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.verify_diff.outputs.changed }}
     steps:
 
       - name: Check Out Repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
 
       - name: Get changes
         id: changed-files
@@ -28,25 +29,19 @@ jobs:
                     echo "changed=true" >> $GITHUB_OUTPUT
                 fi
             done
+  
+
+  docker:
+    needs: changes
+    if: ${{ needs.changes.outputs.changed }} == 'true'
+    runs-on: ubuntu-latest
+    steps:
 
       - name: Discord Failure Notification
-        if: steps.verify_diff.outputs.changed == 'true'
         uses: Kometa-Team/discord-notifications@master
         with:
           webhook_id_token: ${{ secrets.BUILD_WEBHOOK }}
           title: "TRUE"
-          color: 14879811
-          username: Kobota
-          avatar_url: https://raw.githubusercontent.com/Kometa-Team/Kometa/nightly/.github/bot.png
-          author: GitHub
-          author_icon_url: https://raw.githubusercontent.com/Kometa-Team/Kometa/nightly/.github/git.png
-
-      - name: Discord Failure Notification
-        if: steps.verify_diff.outputs.changed != 'true'
-        uses: Kometa-Team/discord-notifications@master
-        with:
-          webhook_id_token: ${{ secrets.BUILD_WEBHOOK }}
-          title: "FALSE"
           color: 14879811
           username: Kobota
           avatar_url: https://raw.githubusercontent.com/Kometa-Team/Kometa/nightly/.github/bot.png
