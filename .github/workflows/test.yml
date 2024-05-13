@@ -34,7 +34,7 @@ jobs:
   docker:
     needs: changes
     runs-on: ubuntu-latest
-    if: ${{ needs.changes.outputs.changed == 'true' }}
+    if: needs.changes.outputs.changed == 'true'
     steps:
 
       - name: Discord Failure Notification
