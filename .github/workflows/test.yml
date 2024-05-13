@@ -54,7 +54,7 @@ jobs:
   docker2:
     needs: changes
     runs-on: ubuntu-latest
-    if: needs.changes.outputs.changed != 'true'
+    if: needs.changes.outputs.build != 'true'
     steps:
 
       - name: Discord Failure Notification
