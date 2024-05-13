@@ -17,6 +17,7 @@ jobs:
 
 
       - name: Get changes
+        id: changed-files
         run: git diff --name-only ${{ github.event.before }} ${{ github.event.after }}
 
       - name: List changed files
