@@ -1,0 +1,26 @@
+name: TEST
+
+on:
+  push:
+    branches: [ master, main ]
+
+jobs:
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Check Out Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+
+      - name: Get changes
+        run: git diff --name-only ${{ github.event.before }} ${{ github.event.after }}
+
+      - name: List changed files
+        run: |
+            for file in ${{ steps.changed-files.outputs.changed_files }}; do
+                echo "$file was changed"
+            done
