@@ -32,7 +32,7 @@ jobs:
                     echo "$file will not trigger docker build"
                 fi
             done
-  
+    
 
   docker:
     needs: changes
@@ -52,16 +52,15 @@ jobs:
           author_icon_url: https://raw.githubusercontent.com/Kometa-Team/Kometa/nightly/.github/git.png
 
   docker2:
-    needs: changes
     runs-on: ubuntu-latest
-    if: needs.changes.outputs.build != 'true'
+    if: ${{ success() }}
     steps:
 
       - name: Discord Failure Notification
         uses: Kometa-Team/discord-notifications@master
         with:
           webhook_id_token: ${{ secrets.BUILD_WEBHOOK }}
-          title: "FALSE"
+          title: "SUCCESS"
           color: 14879811
           username: Kobota
           avatar_url: https://raw.githubusercontent.com/Kometa-Team/Kometa/nightly/.github/bot.png
