@@ -21,17 +21,32 @@ jobs:
         run: echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
 
       - name: List changed files
+        id: verify_diff
         run: |
             for file in ${{ steps.changed-files.outputs.changed_files }}; do
-                echo "$file was changed"
+                if [[ $file == defaults/* ]] || [[ $file == modules/* ]] || [[ $file == main.py ]] ; then
+                    echo "changed=true" >> $GITHUB_OUTPUT
+                fi
             done
 
       - name: Discord Failure Notification
+        if: steps.verify_diff.outputs.changed == 'true'
         uses: Kometa-Team/discord-notifications@master
         with:
           webhook_id_token: ${{ secrets.BUILD_WEBHOOK }}
-          message: <@&1079153184007790652>
-          title: "TEST"
+          title: "TRUE"
+          color: 14879811
+          username: Kobota
+          avatar_url: https://raw.githubusercontent.com/Kometa-Team/Kometa/nightly/.github/bot.png
+          author: GitHub
+          author_icon_url: https://raw.githubusercontent.com/Kometa-Team/Kometa/nightly/.github/git.png
+
+      - name: Discord Failure Notification
+        if: steps.verify_diff.outputs.changed != 'true'
+        uses: Kometa-Team/discord-notifications@master
+        with:
+          webhook_id_token: ${{ secrets.BUILD_WEBHOOK }}
+          title: "FALSE"
           color: 14879811
           username: Kobota
           avatar_url: https://raw.githubusercontent.com/Kometa-Team/Kometa/nightly/.github/bot.png
