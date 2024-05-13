@@ -9,7 +9,7 @@ jobs:
   changes:
     runs-on: ubuntu-latest
     outputs:
-      changed: ${{ steps.verify_diff.outputs.changed }}
+      build: ${{ steps.list-changes.outputs.build }}
     steps:
 
       - name: Check Out Repo
@@ -19,14 +19,17 @@ jobs:
 
       - name: Get changes
         id: changed-files
-        run: echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
+        run: echo "files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
 
       - name: List changed files
-        id: verify_diff
+        id: list-changes
         run: |
-            for file in ${{ steps.changed-files.outputs.changed_files }}; do
+            for file in ${{ steps.get-changes.outputs.files }}; do
                 if [[ $file == defaults/* ]] || [[ $file == modules/* ]] || [[ $file == main.py ]] ; then
-                    echo "changed=true" >> $GITHUB_OUTPUT
+                    echo "$file will trigger docker build"
+                    echo "build=true" >> $GITHUB_OUTPUT
+                else
+                    echo "$file will not trigger docker build"
                 fi
             done
   
@@ -34,7 +37,7 @@ jobs:
   docker:
     needs: changes
     runs-on: ubuntu-latest
-    if: needs.changes.outputs.changed == 'true'
+    if: needs.changes.outputs.build == 'true'
     steps:
 
       - name: Discord Failure Notification
