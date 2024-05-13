@@ -1,1 +1,1 @@
-print("mai20n")
+print("mai20gn")
