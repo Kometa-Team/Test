@@ -25,7 +25,7 @@ jobs:
         id: list-changes
         run: |
             for file in ${{ steps.get-changes.outputs.files }}; do
-                if [[ $file =~ ^(modules|defaults|main.py)$ ]] ; then
+                if [[ $file =~ ^(modules|defaults|main.py).*$ ]] ; then
                     echo "$file will trigger docker build"
                     echo "build=true" >> $GITHUB_OUTPUT
                 else
