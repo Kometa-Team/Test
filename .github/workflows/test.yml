@@ -1,69 +1,14 @@
-name: TEST
+name: 'Check Branch'
 
 on:
-  push:
-    branches: [ master, main ]
+  pull_request:
 
 jobs:
-
-  changes:
+  check_branch:
     runs-on: ubuntu-latest
-    outputs:
-      build: ${{ steps.list-changes.outputs.build }}
     steps:
-
-      - name: Check Out Repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Get changes
-        id: get-changes
-        run: echo "files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
-
-      - name: List changed files
-        id: list-changes
+      - name: Check branch
+        if: github.base_ref == 'main' && github.head_ref != 'develop'
         run: |
-            for file in ${{ steps.get-changes.outputs.files }}; do
-                if [[ $file =~ ^(modules|defaults|main.py).*$ ]] ; then
-                    echo "$file will trigger docker build"
-                    echo "build=true" >> $GITHUB_OUTPUT
-                else
-                    echo "$file will not trigger docker build"
-                fi
-            done
-    
-
-  docker:
-    needs: changes
-    runs-on: ubuntu-latest
-    if: needs.changes.outputs.build == 'true'
-    steps:
-
-      - name: Discord Failure Notification
-        uses: Kometa-Team/discord-notifications@master
-        with:
-          webhook_id_token: ${{ secrets.BUILD_WEBHOOK }}
-          title: "TRUE"
-          color: 14879811
-          username: Kobota
-          avatar_url: https://raw.githubusercontent.com/Kometa-Team/Kometa/nightly/.github/bot.png
-          author: GitHub
-          author_icon_url: https://raw.githubusercontent.com/Kometa-Team/Kometa/nightly/.github/git.png
-
-  docker2:
-    runs-on: ubuntu-latest
-    needs: changes
-    if: ${{ success() && needs.changes.outputs.build == 'true' }}
-    steps:
-
-      - name: Discord Failure Notification
-        uses: Kometa-Team/discord-notifications@master
-        with:
-          webhook_id_token: ${{ secrets.BUILD_WEBHOOK }}
-          title: "SUCCESS"
-          color: 14879811
-          username: Kobota
-          avatar_url: https://raw.githubusercontent.com/Kometa-Team/Kometa/nightly/.github/bot.png
-          author: GitHub
-          author_icon_url: https://raw.githubusercontent.com/Kometa-Team/Kometa/nightly/.github/git.png
+          echo "ERROR: You can only merge to main from dev."
+          exit 1
