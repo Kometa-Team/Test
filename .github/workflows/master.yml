@@ -1,0 +1,20 @@
+name: Update Master
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ff-master:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Check Out Repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT }}
+          ref: develop
+          fetch-depth: 0
+
+      - name: Fast Forward Master
+        run: |
+          git push origin refs/heads/develop:refs/heads/main
