@@ -1,0 +1,20 @@
+name: Update Develop
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ff-develop:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Check Out Repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT }}
+          ref: nightly
+          fetch-depth: 0
+
+      - name: Fast Forward Develop
+        run: |
+          git push origin refs/heads/nightly:refs/heads/develop
