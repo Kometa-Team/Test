@@ -7,8 +7,13 @@ jobs:
   check_branch:
     runs-on: ubuntu-latest
     steps:
-      - name: Check branch
+      - name: Check main
         if: github.base_ref == 'main' && github.head_ref != 'develop'
         run: |
-          echo "ERROR: You can only merge to main from dev."
+          echo "ERROR: You can only merge to main from develop. ${{ github.base_ref }} ${{ github.head_ref }}"
+          exit 1
+      - name: Check develop
+        if: github.base_ref == 'develop' && github.head_ref != 'nightly'
+        run: |
+          echo "ERROR: You can only merge to develop from nightly. ${{ github.base_ref }} ${{ github.head_ref }}"
           exit 1
