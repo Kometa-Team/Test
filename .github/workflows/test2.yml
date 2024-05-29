@@ -6,7 +6,7 @@ jobs:
 
   verify-changes:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name && ${{ github.base_ref }} == 'nightly'
+    if: github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name && ${{ github.base_ref }} == 'nightly' && ${{ github.head_ref }} == docker-*
     outputs:
       build: ${{ steps.list-changes.outputs.build }}
     steps:
