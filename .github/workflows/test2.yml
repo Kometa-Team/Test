@@ -39,10 +39,12 @@ jobs:
                 build_value="1"
                 new_value="${value%-build*}-build1"
             fi
+          
+            original=$(git log -1 HEAD --pretty=format:%s)
             
             echo "$new_value" > "VERSION"
             git config --local user.email "action@github.com"
             git config --local user.name "GitHub Action"
             git add VERSION
-            git commit -m "Build ${build_value}" --amend
+            git commit -m "[${build_value}] ${original}" --amend
             git push origin nightly --force-with-lease
