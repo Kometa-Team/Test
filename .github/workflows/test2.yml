@@ -30,8 +30,8 @@ jobs:
         run: |
             value=$(cat VERSION)
             if [[ "$value" == *"-"* ]]; then
-                build_value="((${value#*-build} + 1))"
-                new_value="${value%-build*}-build${build_value}"
+                build_value="${value#*-build} + 1"
+                new_value="${value%-build*}-build((${build_value}))"
             elif [[ "$value" == *"!"* ]]; then
                 new_value="${value%!*}"
                 build_value="0"
