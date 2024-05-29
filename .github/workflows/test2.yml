@@ -3,36 +3,31 @@ name: Docker Pull Release
 on: pull_request
 
 jobs:
-
-  verify-changes:
+  increment-version:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name && github.base_ref == 'nightly' && startswith(github.head_ref, 'docker-')
-    outputs:
-      build: ${{ steps.list-changes.outputs.build }}
+    if: github.base_ref == 'nightly' && github.event.pull_request.merged
     steps:
-      - name: Check Refs
+
+      - name: Check Out Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: nightly
+
+      - name: Update VERSION
         run: |
-          echo "Base Repo: ${{ github.event.pull_request.base.repo.full_name }}"
-          echo "Base Ref: ${{ github.base_ref }}"
-          echo "Head Repo: ${{ github.event.pull_request.head.repo.full_name }}"
-          echo "Head Ref: ${{ github.head_ref }}"
-
-      - if: github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name
-        run: echo "REPO"
-      - if: github.base_ref == 'nightly'
-        run: echo "BRANCH"
-      - if: startswith(github.head_ref, 'docker-')
-        run: echo "TAG"
-
-      - name: Create Tag
-        id: create-tag
-        run: |
-          echo "Create Tag"
-          if [[ ${{ github.head_ref }} == docker-* ]] ; then
-              echo "IF Tag"
-              var="${{ github.head_ref }}"
-              echo "docker-tag=${ ${{ github.head_ref }}:7 }" >> $GITHUB_OUTPUT
-          fi
-
-      - run: |
-          echo "${{ steps.create-tag.outputs.docker-tag }}"
+            value=$(cat VERSION)
+            if [[ "$value" == *"-"* ]]; then
+                new_value="${value%-develop*}-develop$((${value#*-develop} + 1))"
+            elif [[ "$value" == *"!"* ]]; then
+                new_value="${value%!*}"
+            else
+                new_value="${value%-develop*}-develop1"
+            fi
+            
+            echo "$new_value" > "VERSION"
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            git add VERSION
+            git commit -m "VERSION ${new_value}" -a
+            git push origin nightly
