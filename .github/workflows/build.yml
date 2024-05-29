@@ -2,8 +2,6 @@ name: Docker Pull Release
 
 on:
   pull_request:
-    branches:
-      - nightly
     types: [closed]
 
 jobs:
