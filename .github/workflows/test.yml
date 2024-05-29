@@ -2,6 +2,7 @@ name: 'Check Branch'
 
 on:
   pull_request:
+    branches: [ main, develop ]
 
 jobs:
   check_branch:
@@ -16,10 +17,10 @@ jobs:
       - name: Check main
         if: github.base_ref == 'main' && (github.head_ref != 'develop' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name)
         run: |
-          echo "ERROR: You can only merge to main from develop. ${{ github.base_ref }} ${{ github.head_ref }}"
+          echo "ERROR: You can only merge to main from develop."
           exit 1
       - name: Check develop
         if: github.base_ref == 'develop' && (github.head_ref != 'nightly' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name)
         run: |
-          echo "ERROR: You can only merge to develop from nightly. ${{ github.base_ref }} ${{ github.head_ref }}"
+          echo "ERROR: You can only merge to develop from nightly."
           exit 1

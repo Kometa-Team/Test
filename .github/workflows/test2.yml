@@ -1,0 +1,22 @@
+name: Docker Pull Release
+
+on: pull_request
+
+jobs:
+
+  verify-changes:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name && ${{ github.base_ref }} == 'nightly'
+    outputs:
+      build: ${{ steps.list-changes.outputs.build }}
+    steps:
+
+      - name: Create Tag
+        id: create-tag
+        run: |
+          if [[ ${{ github.head_ref }} == docker-* ]] ; then
+              echo "docker-tag=${{ github.head_ref:7 }}" >> $GITHUB_OUTPUT
+          fi
+
+      - run: |
+          echo ${{ steps.create-tag.outputs.docker-tag }}
