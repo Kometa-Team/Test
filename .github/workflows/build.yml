@@ -43,6 +43,8 @@ jobs:
             fi
             
             echo "$new_value" > "VERSION"
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
             git add VERSION
             git commit -m "${new_msg}" --amend
             git push origin nightly --force-with-lease
