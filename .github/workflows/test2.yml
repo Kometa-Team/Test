@@ -6,7 +6,7 @@ jobs:
 
   verify-changes:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name && ${{ github.base_ref }} == 'nightly' && ${{ github.head_ref }} == docker-*
+    if: github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name && github.base_ref == 'nightly' && github.head_ref == docker-*
     outputs:
       build: ${{ steps.list-changes.outputs.build }}
     steps:
@@ -16,12 +16,12 @@ jobs:
           echo "Base Ref: ${{ github.base_ref }}"
           echo "Head Repo: ${{ github.event.pull_request.head.repo.full_name }}"
           echo "Head Ref: ${{ github.head_ref }}"
-          
+
       - if: github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name
         run: echo "REPO"
-      - if: ${{ github.base_ref }} == 'nightly'
+      - if: github.base_ref == 'nightly'
         run: echo "BRANCH"
-      - if: ${{ github.head_ref }} == docker-*
+      - if: github.head_ref == docker-*
         run: echo "TAG"
 
       - name: Create Tag
