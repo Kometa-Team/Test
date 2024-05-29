@@ -29,22 +29,25 @@ jobs:
       - name: Update VERSION
         run: |
             value=$(cat VERSION)
+            old_msg=$(git log -1 HEAD --pretty=format:%s)
+          
             if [[ "$value" == *"-"* ]]; then
                 build_value="$((${value#*-build} + 1))"
                 new_value="${value%-build*}-build${build_value}"
+                new_msg="[${build_value}] ${old_msg}"
             elif [[ "$value" == *"!"* ]]; then
-                build_value="0"
                 new_value="${value%!*}"
+                new_msg="[${new_value}] ${old_msg}"
             else
-                build_value="1"
                 new_value="${value%-build*}-build1"
+                new_msg="[1] ${old_msg}"
             fi
           
-            original=$(git log -1 HEAD --pretty=format:%s)
             
             echo "$new_value" > "VERSION"
             git config --local user.email "action@github.com"
             git config --local user.name "GitHub Action"
             git add VERSION
+          
             git commit -m "[${build_value}] ${original}" --amend
             git push origin nightly --force-with-lease
