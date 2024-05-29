@@ -30,16 +30,19 @@ jobs:
         run: |
             value=$(cat VERSION)
             if [[ "$value" == *"-"* ]]; then
-                new_value="${value%-develop*}-develop$((${value#*-develop} + 1))"
+                build_value="((${value#*-build} + 1))"
+                new_value="${value%-build*}-build${build_value}"
             elif [[ "$value" == *"!"* ]]; then
                 new_value="${value%!*}"
+                build_value="0"
             else
-                new_value="${value%-develop*}-develop1"
+                new_value="${value%-build*}-build1"
+                build_value="1"
             fi
             
             echo "$new_value" > "VERSION"
             git config --local user.email "action@github.com"
             git config --local user.name "GitHub Action"
             git add VERSION
-            git commit -m "VERSION ${new_value}" -a
-            git push origin nightly
+            git commit -m "Build ${build_value}" --amend
+            git push origin nightly --force-with-lease
