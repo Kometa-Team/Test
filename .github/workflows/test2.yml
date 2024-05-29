@@ -14,10 +14,12 @@ jobs:
       - name: Create Tag
         id: create-tag
         run: |
+          echo "Create Tag"
           if [[ ${{ github.head_ref }} == docker-* ]] ; then
+              echo "IF Tag"
               var="${{ github.head_ref }}"
               echo "docker-tag=${var:7}" >> $GITHUB_OUTPUT
           fi
 
       - run: |
-          echo ${{ steps.create-tag.outputs.docker-tag }}
+          echo "${{ steps.create-tag.outputs.docker-tag }}"
