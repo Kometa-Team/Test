@@ -50,10 +50,8 @@ jobs:
             
             if (( next_build <= develop_build )); then
                 echo "::error::NEXT_BUILD variable (${next_build}) must be greater than DEVELOP_BUILD (${develop_build})"
-                exit 1
             elif (( next_build > nightly_build )); then
                 echo "::error::NEXT_BUILD variable (${next_build}) must be less than or equal to NIGHTLY_BUILD (${nightly_build})"
-                exit 1
             fi
             
             while : ; do
@@ -77,6 +75,5 @@ jobs:
                 hash=$(git rev-parse HEAD)
                 if [[ "$develop_hash" == "$hash" ]]; then
                     echo "::error::No Commit found to Fast Forward"
-                    exit 1
                 fi
             done
