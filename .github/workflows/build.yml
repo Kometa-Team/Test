@@ -26,6 +26,7 @@ jobs:
           fetch-depth: 0
 
       - name: Update VERSION
+        id: update-version
         run: |
             value=$(cat VERSION)
             old_msg=$(git log -1 HEAD --pretty=format:%s)
@@ -41,8 +42,18 @@ jobs:
                 new_value="${value%-build*}-build1"
                 new_msg="[1] ${old_msg}"
             fi
+          
+            echo "commit-msg=${new_msg}" >> $GITHUB_OUTPUT
+            echo "commit-hash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+            echo "commit-short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
             
             echo "$new_value" > "VERSION"
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
             git add VERSION
             git commit -m "${new_msg}" --amend
             git push origin nightly --force-with-lease
+
+      - name: Commit Info
+        run: |
+          echo "[${{ steps.update-version.outputs.commit-short }}](https://github.com/Kometa-Team/Kometa/commit/${{ steps.update-version.outputs.commit-hash }}) ${{ steps.update-version.outputs.commit-msg }}"
