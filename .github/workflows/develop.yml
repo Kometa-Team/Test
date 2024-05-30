@@ -44,7 +44,7 @@ jobs:
                 nightly_build="0"
             fi
           
-            if (( next_build == 0 )); then
+            if [[ "$next_build" == "0" ]]; then
                 next_build="${nightly_build}
             fi
           
