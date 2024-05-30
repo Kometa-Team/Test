@@ -1,0 +1,44 @@
+name: Release New Version
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ff-master:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Create App Token
+        uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.APP_TOKEN }}
+
+      - name: Check Out Repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          ref: nightly
+          fetch-depth: 0
+
+      - name: Fast Forward Master
+        run: |
+            value=$(cat VERSION)
+            version="${value%-build*}"
+            next_version="${{ vars.NEXT_VERSION }}"
+          
+            if [[ "$version" == "$next_version" ]]; then
+                echo "NEXT_VERSION variable: '${next_version}' must not be equal to '${version}'"
+                exit 1
+            fi
+          
+            echo "$next_version" > "VERSION"
+          
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            git add VERSION
+            git commit -m "Kometa Release ${next_version}"
+            git push origin nightly
+            git push origin refs/heads/nightly:refs/heads/develop
+            git push origin refs/heads/nightly:refs/heads/main
