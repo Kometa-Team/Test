@@ -45,7 +45,7 @@ jobs:
             fi
           
             if [[ "$next_build" == "0" ]]; then
-                next_build="${nightly_build}
+                next_build="${nightly_build}"
             fi
           
             echo "DEVELOP_BUILD: '${develop_build}'"
