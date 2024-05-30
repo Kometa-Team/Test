@@ -27,9 +27,11 @@ jobs:
             value=$(cat VERSION)
             version="${value%-build*}"
             next_version="${{ vars.NEXT_VERSION }}"
+            echo "CURRENT_VERSION: '${version}'"
+            echo "NEXT_VERSION: '${next_version}'"
           
             if [[ "$version" == "$next_version" ]]; then
-                echo "NEXT_VERSION variable: '${next_version}' must not be equal to '${version}'"
+                echo "NEXT_VERSION variable must be incremented"
                 exit 1
             fi
           
