@@ -18,7 +18,7 @@ jobs:
           echo "Base Ref: ${{ github.base_ref }}"
           echo "Head Repo: ${{ github.event.pull_request.head.repo.full_name }}"
           echo "Head Ref: ${{ github.head_ref }}"
-          3echo "Body 1: ${{ github.event.pull_request.body }}"
+          echo "Body 1: ${{ github.event.pull_request.body }}"
           
           #body="${{ github.event.pull_request.body }}"
           #echo "Body 2: $body"
@@ -27,6 +27,7 @@ jobs:
           #body=${body%%$'\n'## Issues Fixed or Closed*}
           
           body=$(echo "${{ github.event.pull_request.body }}" | perl -0777 -ne '/.*## Description(.*)##.*/ && print $1,"\n"; ')
+          #-n '/## Description/,/## Issues Fixed or Closed/{/## Description/b;/## Issues Fixed or Closed/b;p}'
           echo "Body 4: $body"
           body=${body//[[:space:]]/}
           echo "Body 5: $body"
