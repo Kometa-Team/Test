@@ -8,7 +8,7 @@ jobs:
 
   validate-pull:
     runs-on: ubuntu-latest
-    if: github.event.action == 'labeled' && github.event.label.name == 'tester'
+    if: github.event.label.name == 'tester' # github.event.action == 'labeled' &&
     steps:
 
       - name: Display Refs
@@ -19,7 +19,11 @@ jobs:
           echo "Head Repo: ${{ github.event.pull_request.head.repo.full_name }}"
           echo "Head Ref: ${{ github.head_ref }}"
           
-          body=$(echo "${{ github.event.pull_request.body }}" | perl -0777 -ne '/.*## Description(.*)##.*/ && print $1,"\n"; ')
+          body=${{ github.event.pull_request.body }}
+          body=${body#*$## Description$'\n'}
+          body=${body%%$'\n'## Issues Fixed or Closed*}
+          
+          #body=$(echo "${{ github.event.pull_request.body }}" | perl -0777 -ne '/.*## Description(.*)##.*/ && print $1,"\n"; ')
           echo "Body: $body"
           body=${body//[[:space:]]/}
           echo "Body: $body"
