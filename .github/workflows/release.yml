@@ -28,6 +28,13 @@ jobs:
             version="${value%-build*}"
             echo "CURRENT_VERSION: '${version}'"
           
+            IFS='.' read -r majo mino patc <<< "$version"
+          
+            echo "MAJOR='${majo}'"
+            echo "MINOR='${mino}'"
+            echo "PATCH='${patc}'"
+            
+          
             MAJOR="$(echo ${VER} | cut -d'.' -f1)"
             MINOR="$(echo ${VER} | cut -d'.' -f2)"
             PATCH="$(echo ${VER} | cut -d'.' -f3)"
@@ -40,10 +47,10 @@ jobs:
           
             echo "${MAJOR}.${MINOR}.${PATCH}" > "VERSION"
           
-            git config --local user.email "action@github.com"
-            git config --local user.name "GitHub Action"
-            git add VERSION
-            git commit -m "Kometa Release ${next_version}"
-            git push origin nightly
-            git push origin refs/heads/nightly:refs/heads/develop
-            git push origin refs/heads/nightly:refs/heads/main
+            #git config --local user.email "action@github.com"
+            #git config --local user.name "GitHub Action"
+            #git add VERSION
+            #git commit -m "Kometa Release ${next_version}"
+            #git push origin nightly
+            #git push origin refs/heads/nightly:refs/heads/develop
+            #git push origin refs/heads/nightly:refs/heads/main
