@@ -54,6 +54,5 @@ jobs:
             git push origin refs/heads/nightly:refs/heads/main
 
       - name: Fast Forward Master
-        id: release
         run: |
             echo "NEW_VERSION: '${{ steps.release.outputs.new_ver }}'"
