@@ -1,27 +1,19 @@
-name: Update Master
+name: Labeled
 
 on:
-  workflow_dispatch:
+  pull_request:
+    types: [labeled]
 
 jobs:
-  ff-master:
+
+  validate-pull:
     runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'tester')
     steps:
 
-      - name: Create App Token
-        uses: actions/create-github-app-token@v1
-        id: app-token
-        with:
-          app-id: ${{ vars.APP_ID }}
-          private-key: ${{ secrets.APP_TOKEN }}
-
-      - name: Check Out Repo
-        uses: actions/checkout@v4
-        with:
-          token: ${{ steps.app-token.outputs.token }}
-          ref: develop
-          fetch-depth: 0
-
-      - name: Fast Forward Master
+      - name: Display Refs
         run: |
-          git push origin refs/heads/develop:refs/heads/main
+          echo "Base Repo: ${{ github.event.pull_request.base.repo.full_name }}"
+          echo "Base Ref: ${{ github.base_ref }}"
+          echo "Head Repo: ${{ github.event.pull_request.head.repo.full_name }}"
+          echo "Head Ref: ${{ github.head_ref }}"
