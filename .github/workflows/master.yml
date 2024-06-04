@@ -18,18 +18,18 @@ jobs:
           echo "Base Ref: ${{ github.base_ref }}"
           echo "Head Repo: ${{ github.event.pull_request.head.repo.full_name }}"
           echo "Head Ref: ${{ github.head_ref }}"
-          echo "Body: ${{ github.event.pull_request.body }}"
+          3echo "Body 1: ${{ github.event.pull_request.body }}"
           
-          body="${{ github.event.pull_request.body }}"
-          echo "Body: $body"
-          body=${body#*$## Description$'\n'}
-          echo "Body: $body"
-          body=${body%%$'\n'## Issues Fixed or Closed*}
+          #body="${{ github.event.pull_request.body }}"
+          #echo "Body 2: $body"
+          #body=${body#*$## Description$'\n'}
+          #echo "Body 3: $body"
+          #body=${body%%$'\n'## Issues Fixed or Closed*}
           
-          #body=$(echo "${{ github.event.pull_request.body }}" | perl -0777 -ne '/.*## Description(.*)##.*/ && print $1,"\n"; ')
-          echo "Body: $body"
+          body=$(echo "${{ github.event.pull_request.body }}" | perl -0777 -ne '/.*## Description(.*)##.*/ && print $1,"\n"; ')
+          echo "Body 4: $body"
           body=${body//[[:space:]]/}
-          echo "Body: $body"
+          echo "Body 5: $body"
           echo "description=$body" >> $GITHUB_OUTPUT
           
 
