@@ -23,6 +23,7 @@ jobs:
           fetch-depth: 0
 
       - name: Fast Forward Master
+        id: release
         run: |
             value=$(cat VERSION)
             version="${value%-build*}"
@@ -39,7 +40,10 @@ jobs:
             echo "NEWVERSION='${MAJOR}.$((MINOR+1)).0'"
             echo "NEWVERSION='$((MAJOR+1)).0.0'"
           
-            echo "${MAJOR}.$((MINOR+1)).0" > "VERSION"
+            NEW_VERSION="$((MAJOR+1)).0.0"
+            echo "new_ver=$NEW_VERSION" >> $GITHUB_OUTPUT
+          
+            echo "$NEW_VERSION" > "VERSION"
           
             git config --local user.email "action@github.com"
             git config --local user.name "GitHub Action"
@@ -48,3 +52,8 @@ jobs:
             git push origin nightly
             git push origin refs/heads/nightly:refs/heads/develop
             git push origin refs/heads/nightly:refs/heads/main
+
+      - name: Fast Forward Master
+        id: release
+        run: |
+            echo "NEW_VERSION: '${{ steps.release.outputs.new_ver }}'"
