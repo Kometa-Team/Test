@@ -8,7 +8,7 @@ jobs:
 
   validate-pull:
     runs-on: ubuntu-latest
-    if: github.event.label.name == 'tester' # github.event.action == 'labeled' &&
+    #if: github.event.label.name == 'tester' # github.event.action == 'labeled' &&
     steps:
 
       - name: Display Refs
