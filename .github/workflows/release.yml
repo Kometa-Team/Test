@@ -2,6 +2,15 @@ name: Release New Version
 
 on:
   workflow_dispatch:
+    inputs:
+      release_type:
+        type: choice
+        description: Choose which type of release to perform.
+        options:
+          - major
+          - minor
+          - patch
+        default: patch
 
 jobs:
   ff-master:
@@ -36,11 +45,17 @@ jobs:
             echo "MAJOR='${MAJOR}'"
             echo "MINOR='${MINOR}'"
             echo "PATCH='${PATCH}'"
-            echo "NEWVERSION='${MAJOR}.${MINOR}.$((PATCH+1))'"
-            echo "NEWVERSION='${MAJOR}.$((MINOR+1)).0'"
-            echo "NEWVERSION='$((MAJOR+1)).0.0'"
+            
+            if [[ "${{ github.event.inputs.release_type }}" == "major" ]]; then
+                NEW_VERSION="$((MAJOR+1)).0.0"
+            elif [[ "${{ github.event.inputs.release_type }}" == "minor" ]]; then
+                NEW_VERSION="${MAJOR}.$((MINOR+1)).0"
+            else
+                NEW_VERSION="${MAJOR}.${MINOR}.$((PATCH+1))"
+            fi
+            
+            echo "NEWVERSION='${NEW_VERSION}'"
           
-            NEW_VERSION="$((MAJOR+1)).0.0"
             echo "new_ver=$NEW_VERSION" >> $GITHUB_OUTPUT
           
             echo "$NEW_VERSION" > "VERSION"
