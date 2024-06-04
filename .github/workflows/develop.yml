@@ -51,7 +51,7 @@ jobs:
             echo "DEVELOP_BUILD: '${develop_build}'"
             echo "NIGHTLY_BUILD: '${nightly_build}'"
           
-            if ! [[ "${{ github.event.inputs.build_number }}" =~ "^[0-9]+$" ]]; then
+            if ! [[ ${{ github.event.inputs.build_number }} =~ ^[0-9]+$ ]]; then
                 echo "::error::BUILD_NUMBER (${{ github.event.inputs.build_number }}) must be a number"
                 exit 1
             elif [[ "${{ github.event.inputs.build_number }}" == "0" ]]; then
