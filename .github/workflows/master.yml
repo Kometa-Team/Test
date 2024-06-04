@@ -2,18 +2,40 @@ name: Labeled
 
 on:
   pull_request:
-    types: [labeled]
+    types: [opened, synchronize, reopened, labeled]
 
 jobs:
 
   validate-pull:
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.labels.*.name, 'tester')
+    if: github.event.action == 'labeled' && github.event.label.name == 'tester'
     steps:
 
       - name: Display Refs
+        id: refs
         run: |
           echo "Base Repo: ${{ github.event.pull_request.base.repo.full_name }}"
           echo "Base Ref: ${{ github.base_ref }}"
           echo "Head Repo: ${{ github.event.pull_request.head.repo.full_name }}"
           echo "Head Ref: ${{ github.head_ref }}"
+          
+          body=$(echo "${{ github.event.pull_request.body }}" | sed -E 's/.*### Description(.*)##.*/\1/')
+          echo $body
+          body=${body//[[:space:]]/}
+          echo $body
+          echo "description=$body" >> $GITHUB_OUTPUT
+          
+
+      - name: Discord Notification
+        uses: Kometa-Team/discord-notifications@master
+        with:
+          webhook_id_token: ${{ secrets.BUILD_WEBHOOK }}
+          message: "Tester"
+          title: ${{ github.event.pull_request.title }}
+          description: ${{ steps.refs.outputs.description }}
+          url: https://github.com/Kometa-Team/${{ vars.REPO_NAME }}/pull/${{ github.event.number }}
+          color: ${{ vars.COLOR_SUCCESS }}
+          username: ${{ vars.BOT_NAME }}
+          avatar_url: ${{ vars.BOT_IMAGE }}
+          author: ${{ vars.GIT_NAME }}
+          author_icon_url: ${{ vars.GIT_IMAGE }}
