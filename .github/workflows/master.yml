@@ -34,6 +34,7 @@ jobs:
           message: "The Kometa team are requesting @Testers to assist with testing an upcoming feature/bug fix.
           
                     * For Local Git pull and checkout the `${{ github.head_ref }}` branch 
+                    
                     * For Docker use the `kometateam/kometa:${{ github.head_ref }}` image to do your testing
                     
                     Please report back either here or on the original GitHub Pull Request"
