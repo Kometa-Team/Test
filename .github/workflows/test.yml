@@ -1,26 +1,16 @@
-name: 'Check Branch'
+name: 'Remove Tag'
 
 on:
-  pull_request:
-    branches: [ main, develop ]
+  workflow_dispatch:
 
 jobs:
-  check_branch:
+  remove-tag:
     runs-on: ubuntu-latest
     steps:
-      - name: Check Refs
+      - name: remove tag
         run: |
-          echo "Base Repo: ${{ github.event.pull_request.base.repo.full_name }}"
-          echo "Base Ref: ${{ github.base_ref }}"
-          echo "Head Repo: ${{ github.event.pull_request.head.repo.full_name }}"
-          echo "Head Ref: ${{ github.head_ref }}"
-      - name: Check main
-        if: github.base_ref == 'main' && (github.head_ref != 'develop' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name)
-        run: |
-          echo "ERROR: You can only merge to main from develop."
-          exit 1
-      - name: Check develop
-        if: github.base_ref == 'develop' && (github.head_ref != 'nightly' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name)
-        run: |
-          echo "ERROR: You can only merge to develop from nightly."
-          exit 1
+            HUB_TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d "{\"username\": \"${{ secrets.DOCKER_HUB_USERNAME }}\", \"password\": \"${{ secrets.DOCKER_HUB_PASSWORD }}\"}" https://hub.docker.com/v2/users/login/ | jq -r .token)
+            curl -i -X DELETE \
+            -H "Accept: application/json" \
+            -H "Authorization: JWT $HUB_TOKEN" \
+            https://hub.docker.com/v2/repositories/kometateam/kometa/tags/letterboxd-user-lists/
