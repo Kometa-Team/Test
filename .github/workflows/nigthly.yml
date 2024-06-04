@@ -13,4 +13,3 @@ jobs:
       - name: Commit Info
         run: |
           echo "TEST"
-      
