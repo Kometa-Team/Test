@@ -18,12 +18,12 @@ jobs:
           echo "Base Ref: ${{ github.base_ref }}"
           echo "Head Repo: ${{ github.event.pull_request.head.repo.full_name }}"
           echo "Head Ref: ${{ github.head_ref }}"
-          echo "Body 1: ${{ github.event.pull_request.body }}"
           body="${{ github.event.pull_request.body }}"
+          #echo "Body 1: $body"
           body=$(echo "$body" | sed -n '/## Description/,/## Issues Fixed or Closed/{/## Description/b;/## Issues Fixed or Closed/b;p}')
-          echo "Body 4: $body"
-          body=${body//[[:space:]]/}
-          echo "Body 5: $body"
+          #echo "Body 2: $body"
+          body=$(echo $body|tr -d '\n')
+          #echo "Body 3: $body"
           echo "description=$body" >> $GITHUB_OUTPUT
           
 
