@@ -19,10 +19,10 @@ jobs:
           echo "Head Repo: ${{ github.event.pull_request.head.repo.full_name }}"
           echo "Head Ref: ${{ github.head_ref }}"
           
-          body=$(echo "${{ github.event.pull_request.body }}" | sed -E 's/.*### Description(.*)##.*/\1/')
-          echo $body
+          body=$(echo "${{ github.event.pull_request.body }}" | perl -0777 -ne '/.*## Description(.*)##.*/ && print $1,"\n"; ')
+          echo "Body: $body"
           body=${body//[[:space:]]/}
-          echo $body
+          echo "Body: $body"
           echo "description=$body" >> $GITHUB_OUTPUT
           
 
