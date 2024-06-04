@@ -28,9 +28,9 @@ jobs:
             version="${value%-build*}"
             echo "CURRENT_VERSION: '${version}'"
           
-            MAJOR=$(awk -F. '{print $1}' <<< ${VER})
-            MINOR=$(awk -F. '{print $2}' <<< ${VER})
-            PATCH=$(awk -F. '{print $3}' <<< ${VER})
+            MAJOR="$(echo ${VER} | cut -d'.' -f1)"
+            MINOR="$(echo ${VER} | cut -d'.' -f2)"
+            PATCH="$(echo ${VER} | cut -d'.' -f3)"
             PATCH=$((PATCH+1))
           
             echo "MAJOR='${MAJOR}'"
