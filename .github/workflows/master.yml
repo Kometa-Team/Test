@@ -20,7 +20,9 @@ jobs:
           echo "Head Ref: ${{ github.head_ref }}"
           
           body=${{ github.event.pull_request.body }}
+          echo "Body: $body"
           body=${body#*$## Description$'\n'}
+          echo "Body: $body"
           body=${body%%$'\n'## Issues Fixed or Closed*}
           
           #body=$(echo "${{ github.event.pull_request.body }}" | perl -0777 -ne '/.*## Description(.*)##.*/ && print $1,"\n"; ')
