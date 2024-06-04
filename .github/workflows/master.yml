@@ -18,8 +18,9 @@ jobs:
           echo "Base Ref: ${{ github.base_ref }}"
           echo "Head Repo: ${{ github.event.pull_request.head.repo.full_name }}"
           echo "Head Ref: ${{ github.head_ref }}"
+          echo "Body: ${{ github.event.pull_request.body }}"
           
-          body=${{ github.event.pull_request.body }}
+          body="${{ github.event.pull_request.body }}"
           echo "Body: $body"
           body=${body#*$## Description$'\n'}
           echo "Body: $body"
