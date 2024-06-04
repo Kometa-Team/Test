@@ -35,9 +35,11 @@ jobs:
             echo "MAJOR='${MAJOR}'"
             echo "MINOR='${MINOR}'"
             echo "PATCH='${PATCH}'"
+            echo "NEWVERSION='${MAJOR}.${MINOR}.$((PATCH+1))'"
             echo "NEWVERSION='${MAJOR}.$((MINOR+1)).0'"
+            echo "NEWVERSION='$((MAJOR+1)).0.0'"
           
-            echo "${MAJOR}.${MINOR}.${PATCH}" > "VERSION"
+            echo "${MAJOR}.$((MINOR+1)).0" > "VERSION"
           
             git config --local user.email "action@github.com"
             git config --local user.name "GitHub Action"
