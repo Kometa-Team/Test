@@ -57,3 +57,7 @@ jobs:
       - name: Commit Info
         run: |
           echo "[${{ steps.update-version.outputs.commit-short }}](https://github.com/Kometa-Team/Kometa/commit/${{ steps.update-version.outputs.commit-hash }}) ${{ steps.update-version.outputs.commit-msg }}"
+
+      - name: Branch Info
+        run: |
+          echo "${{ github.head_ref }}"
