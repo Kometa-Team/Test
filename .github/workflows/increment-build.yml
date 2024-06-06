@@ -44,6 +44,7 @@ jobs:
                     build_value="$((${value2%.*} + 1))"
                 else
                     build_value="$((${value2} + 1))"
+                fi
             else
                 build_value="1"
             fi
