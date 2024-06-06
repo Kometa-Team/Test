@@ -1,4 +1,4 @@
-name: Update Develop
+name: Develop Release
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ on:
         default: 0
 
 jobs:
-  ff-develop:
+  release-develop:
     runs-on: ubuntu-latest
     steps:
 
@@ -27,10 +27,10 @@ jobs:
           fetch-depth: 0
 
       - name: Fast Forward Develop
+        id: forward
         run: |
             value=$(cat VERSION)
             develop_hash=$(git rev-parse HEAD)
-            next_build="${{ vars.DEVELOP_BUILD }}"
           
             if [[ "$value" == *"-"* ]]; then
                 develop_build="$((${value#*-build}))"
@@ -39,7 +39,6 @@ jobs:
             fi
           
             git checkout origin/nightly
-            
             value=$(cat VERSION)
           
             if [[ "$value" == *"-"* ]]; then
@@ -67,7 +66,8 @@ jobs:
             fi
           
             echo "NEXT_BUILD: '${next_build}'"
-            
+            echo "build=next_build" >> $GITHUB_OUTPUT
+          
             while : ; do
                 value=$(cat VERSION)
           
