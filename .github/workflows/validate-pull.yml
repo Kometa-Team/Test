@@ -1,7 +1,7 @@
 name: Validate Pull Request
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, synchronize, reopened, labeled]
 
 jobs:
@@ -16,6 +16,7 @@ jobs:
           echo "Base Ref: ${{ github.base_ref }}"
           echo "Head Repo: ${{ github.event.pull_request.head.repo.full_name }}"
           echo "Head Ref: ${{ github.head_ref }}"
+          echo "PR Ref: ${{ github.event.pull_request.head.ref }}"
 
       - name: Check Base Branch
         if: github.base_ref == 'master' || github.base_ref == 'develop'
@@ -39,34 +40,34 @@ jobs:
       - name: Check Out Repo
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
 
-      #- name: Update VERSION File
-      #  id: update-version
-      #  run: |
-      #      value=$(cat VERSION)
-      #      old_msg=$(git log -1 HEAD --pretty=format:%s)
-      #      version="${value%-build*}"
-      #
-      #      if [[ "$value" == *"-"* ]]; then
-      #          build_value="$((${value#*-build} + 1))"
-      #      else
-      #          build_value="1"
-      #          part_value="0"
-      #      fi
-      #
-      #      new_value="${version}-build${build_value}"
-      #      new_msg="[${build_value}] ${old_msg}"
-      #
-      #      echo "version=${version}" >> $GITHUB_OUTPUT
-      #      echo "build-value=${build_value}" >> $GITHUB_OUTPUT
-      #      echo "commit-msg=${old_msg}" >> $GITHUB_OUTPUT
-      #      echo "commit-hash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-      #      echo "commit-short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-      #
-      #      echo "$new_value" > "VERSION"
-      #      git config --local user.email "action@github.com"
-      #      git config --local user.name "GitHub Action"
-      #      git add VERSION
-      #      git commit -m "${new_msg}" --amend
-      #      git push origin nightly --force-with-lease
+      - name: Update VERSION File
+        id: update-version
+        run: |
+            value=$(cat VERSION)
+            version="${value%-build*}"
+      
+            if [[ "$value" == *"-"* ]]; then
+                value2="${value#*-build}"
+                if [[ "$value2" == *"."* ]]; then
+                    build_value="${value2%.*}"
+                    part_value="$((${value2#*.} + 1))"
+                else
+                    build_value="${value#*-build}
+                    part_value="1"
+                fi
+            else
+                build_value="0"
+                part_value="1"
+            fi
+      
+            new_value="${version}-build${build_value}.${part_value}"
+      
+            echo "$new_value" > "VERSION"
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            git add VERSION
+            git commit -m "Part: ${part_value}"
+            git push ${{ github.event.pull_request.head.repo.full_name }} ${{ github.event.pull_request.head.ref }}
