@@ -1,0 +1,72 @@
+name: Validate Pull Request
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+
+jobs:
+
+  validate-pull:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Display Refs
+        run: |
+          echo "Base Repo: ${{ github.event.pull_request.base.repo.full_name }}"
+          echo "Base Ref: ${{ github.base_ref }}"
+          echo "Head Repo: ${{ github.event.pull_request.head.repo.full_name }}"
+          echo "Head Ref: ${{ github.head_ref }}"
+
+      - name: Check Base Branch
+        if: github.base_ref == 'master' || github.base_ref == 'develop'
+        run: |
+          echo "ERROR: Pull Requests cannot be submitted to master or develop. Please submit the Pull Request to the nightly branch"
+          exit 1
+
+  docker-build-pull:
+    runs-on: ubuntu-latest
+    needs: [ validate-pull ]
+    if: contains(github.event.pull_request.labels.*.name, 'docker') || contains(github.event.pull_request.labels.*.name, 'testers')
+    steps:
+
+      - name: Create App Token
+        uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.APP_TOKEN }}
+
+      - name: Check Out Repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      #- name: Update VERSION File
+      #  id: update-version
+      #  run: |
+      #      value=$(cat VERSION)
+      #      old_msg=$(git log -1 HEAD --pretty=format:%s)
+      #      version="${value%-build*}"
+      #
+      #      if [[ "$value" == *"-"* ]]; then
+      #          build_value="$((${value#*-build} + 1))"
+      #      else
+      #          build_value="1"
+      #          part_value="0"
+      #      fi
+      #
+      #      new_value="${version}-build${build_value}"
+      #      new_msg="[${build_value}] ${old_msg}"
+      #
+      #      echo "version=${version}" >> $GITHUB_OUTPUT
+      #      echo "build-value=${build_value}" >> $GITHUB_OUTPUT
+      #      echo "commit-msg=${old_msg}" >> $GITHUB_OUTPUT
+      #      echo "commit-hash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+      #      echo "commit-short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      #
+      #      echo "$new_value" > "VERSION"
+      #      git config --local user.email "action@github.com"
+      #      git config --local user.name "GitHub Action"
+      #      git add VERSION
+      #      git commit -m "${new_msg}" --amend
+      #      git push origin nightly --force-with-lease
