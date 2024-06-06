@@ -39,7 +39,11 @@ jobs:
             version="${value%-build*}"
           
             if [[ "$value" == *"-"* ]]; then
-                build_value="$((${value#*-build} + 1))"
+                value2="${value#*-build}"
+                if [[ "$value2" == *"."* ]]; then
+                    build_value="$((${value2%.*} + 1))"
+                else
+                    build_value="$((${value2} + 1))"
             else
                 build_value="1"
             fi
