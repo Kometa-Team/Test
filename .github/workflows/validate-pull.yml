@@ -55,7 +55,7 @@ jobs:
                     build_value="${value2%.*}"
                     part_value="$((${value2#*.} + 1))"
                 else
-                    build_value="${value#*-build}
+                    build_value="${value#*-build}"
                     part_value="1"
                 fi
             else
