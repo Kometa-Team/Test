@@ -55,11 +55,11 @@ jobs:
             echo "Repo: ${repo_name}"
             echo "Base: ${base_name}"
             if [[ "${branch_name}" =~ ^(master|develop|nightly)$ ]]; then 
-                echo "True"
-                tag_name=${{ github.event.pull_request.head.ref }}
-            else
-                echo "False"
                 tag_name="${base_name}"
+                echo "True"
+            else
+                tag_name="${branch_name}"
+                echo "False"
             fi
             echo "Tag: ${tag_name}"
             if [[ "${base_name}" == "Kometa-Team" ]]; then
@@ -70,9 +70,9 @@ jobs:
           
             echo "The Kometa team are requesting <@&917323027438510110> to assist with testing an upcoming feature/bug fix."
 
-            echo "* For Local Git pull and checkout the `${{ github.event.pull_request.head.ref }}` branch ${extra}"
+            echo "* For Local Git pull and checkout the (${branch_name}) branch${extra}"
 
-            echo "* For Docker use the `kometateam/kometa:${tag_name}` image to do your testing"
+            echo "* For Docker use the (kometateam/kometa:${tag_name}) image to do your testing"
 
             echo "Please report back either here or on the original GitHub Pull Request"
             
