@@ -16,6 +16,8 @@ jobs:
       commit-hash: ${{ steps.update-version.outputs.commit-hash }}
       commit-short: ${{ steps.update-version.outputs.commit-short }}
     steps:
+      - name: Print
+        run: env | sort
 
       - name: Create App Token
         uses: actions/create-github-app-token@v1
