@@ -8,17 +8,16 @@ jobs:
 
   validate-pull:
     runs-on: ubuntu-latest
+    outputs:
+      build: ${{ steps.list-changes.outputs.build }}
     steps:
-      - name: Print
-        run: env | sort
 
       - name: Display Refs
         run: |
           echo "Base Repo: ${{ github.event.pull_request.base.repo.full_name }}"
           echo "Base Ref: ${{ github.base_ref }}"
           echo "Head Repo: ${{ github.event.pull_request.head.repo.full_name }}"
-          echo "Head Ref: ${{ github.head_ref }}"
-          echo "PR Ref: ${{ github.event.pull_request.head.ref }}"
+          echo "Head Ref: ${{ github.event.pull_request.head.ref }}"
 
       - name: Check Base Branch
         if: github.base_ref == 'master' || github.base_ref == 'develop'
@@ -26,10 +25,32 @@ jobs:
           echo "ERROR: Pull Requests cannot be submitted to master or develop. Please submit the Pull Request to the nightly branch"
           exit 1
 
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+      - name: Get changes
+        id: get-changes
+        run: echo "files=$(git diff --name-only HEAD^ | xargs)" >> $GITHUB_OUTPUT
+
+      - name: List changed files
+        id: list-changes
+        run: |
+            for file in ${{ steps.get-changes.outputs.files }}; do
+                if [[ $file =~ ^(defaults|fonts|modules|kometa.py|requirements.txt|.dockerignore|Dockerfile).*$ ]] ; then
+                    echo "$file will trigger docker build"
+                    echo "build=true" >> $GITHUB_OUTPUT
+                else
+                    echo "$file will not trigger docker build"
+                fi
+            done
+
   docker-build-pull:
     runs-on: ubuntu-latest
     needs: [ validate-pull ]
-    if: contains(github.event.pull_request.labels.*.name, 'docker') || contains(github.event.pull_request.labels.*.name, 'tester')
+    if: needs.verify-changes.outputs.build == 'true' && (contains(github.event.pull_request.labels.*.name, 'docker') || contains(github.event.pull_request.labels.*.name, 'tester'))
     steps:
 
       - name: Create App Token
@@ -51,33 +72,23 @@ jobs:
             branch_name=${{ github.event.pull_request.head.ref }}
             repo_name=${{ github.event.pull_request.head.repo.full_name }}
             base_name="${repo_name%/*}"
-            echo "Branch: ${branch_name}"
-            echo "Repo: ${repo_name}"
-            echo "Base: ${base_name}"
             if [[ "${branch_name}" =~ ^(master|develop|nightly)$ ]]; then 
                 tag_name="${base_name}"
-                echo "True"
             else
                 tag_name="${branch_name}"
-                echo "False"
             fi
-            echo "Tag: ${tag_name}"
+            echo "tag-name=${tag_name}" >> $GITHUB_OUTPUT
+          
             if [[ "${base_name}" == "Kometa-Team" ]]; then
                 extra=""
             else
                 extra=" from the ${{ github.event.pull_request.head.repo.full_name }} repo"
             fi
-          
-            echo "The Kometa team are requesting <@&917323027438510110> to assist with testing an upcoming feature/bug fix."
-
-            echo "* For Local Git pull and checkout the (${branch_name}) branch${extra}"
-
-            echo "* For Docker use the (kometateam/kometa:${tag_name}) image to do your testing"
-
-            echo "Please report back either here or on the original GitHub Pull Request"
+            echo "extra-text=${extra}" >> $GITHUB_OUTPUT
             
-          
             value=$(cat VERSION)
+            old_msg=$(git log -1 HEAD --pretty=format:%s)
+            echo "commit-msg=${old_msg}" >> $GITHUB_OUTPUT
             version="${value%-build*}"
       
             if [[ "$value" == *"-"* ]]; then
@@ -95,10 +106,11 @@ jobs:
             fi
       
             new_value="${version}-build${build_value}.${part_value}"
+            echo "version=${new_value}" >> $GITHUB_OUTPUT
       
             echo "$new_value" > "VERSION"
             git config --local user.email "action@github.com"
             git config --local user.name "GitHub Action"
             git add VERSION
-            git commit -m "Part: ${part_value}"
+            git commit -m "${tag_name} Part: ${part_value}"
             git push
