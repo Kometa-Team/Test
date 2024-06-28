@@ -64,6 +64,7 @@ jobs:
       - name: Check Out Repo
         uses: actions/checkout@v4
         with:
+          token: ${{ secrets.PAT }}
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
 
@@ -128,7 +129,7 @@ jobs:
           body='${{ github.event.pull_request.body }}'
           body=$(echo "$body" | sed -n '/## Description/,/##/{/## Description/b;/##/b;p}')
           body=$(echo $body|tr -d '\n')
-          echo 'description=$body' >> $GITHUB_OUTPUT
+          echo "description=$body" >> $GITHUB_OUTPUT
 
       - name: Discord Testers Notification
         uses: Kometa-Team/discord-notifications@master
