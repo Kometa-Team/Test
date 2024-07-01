@@ -35,12 +35,8 @@ jobs:
       - name: Get changes
         id: get-changes
         run: | 
-            if [[ ${{ github.event.action }} == "labeled" ]]; then
-                if [[ ${{ github.event.label.name }} == "tester" || ${{ github.event.label.name }} == "docker" ]]; then
-                    echo "files=$(git diff --name-only origin/master HEAD | xargs)" >> $GITHUB_OUTPUT
-                else
-                    echo "files=$(git diff --name-only HEAD^ | xargs)" >> $GITHUB_OUTPUT
-                fi
+            if [[ ${{ github.event.action }} == "labeled" && (contains(github.event.pull_request.labels.*.name, 'tester') || contains(github.event.pull_request.labels.*.name, 'docker')) ]]; then
+                echo "files=$(git diff --name-only origin/master HEAD | xargs)" >> $GITHUB_OUTPUT
             else
                 echo "files=$(git diff --name-only HEAD^ | xargs)" >> $GITHUB_OUTPUT
             fi
