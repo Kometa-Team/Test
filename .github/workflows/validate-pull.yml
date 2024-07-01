@@ -35,8 +35,8 @@ jobs:
       - name: Get changes
         id: get-changes
         run: | 
-            git remote add -f origin https://github.com/Kometa-Team/Test.git
-            git remote update
+            git remote show
+            git remote show origin
             if [[ ${{ github.event.action }} == "labeled" ]]; then
                 echo "files=$(git diff --name-only origin/nightly HEAD | xargs)" >> $GITHUB_OUTPUT
             else
