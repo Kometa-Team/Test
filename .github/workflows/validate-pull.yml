@@ -28,13 +28,15 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
 
       - name: Get changes
         id: get-changes
         run: | 
+            git remote add -f origin https://github.com/Kometa-Team/Test.git
+            git remote update
             if [[ ${{ github.event.action }} == "labeled" ]]; then
                 echo "files=$(git diff --name-only origin/nightly HEAD | xargs)" >> $GITHUB_OUTPUT
             else
