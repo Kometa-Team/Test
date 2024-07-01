@@ -34,7 +34,12 @@ jobs:
 
       - name: Get changes
         id: get-changes
-        run: echo "files=$(git diff --name-only HEAD^ | xargs)" >> $GITHUB_OUTPUT
+        run: | 
+            if [[ ${{ github.event.action }} == "labeled" && (${{ github.event.label.name }} == "tester" || ${{ github.event.label.name }} == "docker") ]]; then
+                echo "files=$(git diff --name-only origin/master HEAD | xargs)" >> $GITHUB_OUTPUT
+            else
+                echo "files=$(git diff --name-only HEAD^ | xargs)" >> $GITHUB_OUTPUT
+            fi
 
       - name: List changed files
         id: list-changes
@@ -129,10 +134,11 @@ jobs:
     steps:
 
       - name: Get Description
+        env:
+          DESC: ${{ github.event.pull_request.body }}
         id: get-description
         run: |
-          body='${{ github.event.pull_request.body }}'
-          body=$(echo "$body" | sed -n '/## Description/,/##/{/## Description/b;/##/b;p}')
+          body=$(echo "$DESC" | sed -n '/## Description/,/##/{/## Description/b;/##/b;p}')
           body=$(echo $body|tr -d '\n')
           echo "description=$body" >> $GITHUB_OUTPUT
 
@@ -167,6 +173,7 @@ jobs:
         with:
           webhook_id_token: ${{ secrets.BUILD_WEBHOOK }}
           message: 'New Commit Pushed to `${{ needs.docker-build-pull.outputs.tag-name }}`: ${{ needs.docker-build-pull.outputs.version }}'
+          title: ${{ github.event.pull_request.title }}
           description: ${{ needs.docker-build-pull.outputs.commit-msg }}
           url: https://github.com/Kometa-Team/${{ vars.REPO_NAME }}/pull/${{ github.event.number }}
           color: ${{ vars.COLOR_SUCCESS }}
