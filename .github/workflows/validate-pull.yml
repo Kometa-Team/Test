@@ -37,8 +37,10 @@ jobs:
         run: | 
             git remote show
             git remote show origin
+            git remote add -f upstream https://github.com/Kometa-Team/Test.git
+            git remote update
             if [[ ${{ github.event.action }} == "labeled" ]]; then
-                echo "files=$(git diff --name-only origin/nightly HEAD | xargs)" >> $GITHUB_OUTPUT
+                echo "files=$(git diff --name-only upstream/nightly HEAD | xargs)" >> $GITHUB_OUTPUT
             else
                 echo "files=$(git diff --name-only HEAD^ | xargs)" >> $GITHUB_OUTPUT
             fi
