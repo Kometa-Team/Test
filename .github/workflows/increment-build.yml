@@ -98,7 +98,7 @@ jobs:
             echo "commit-short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
           
             echo "$new_value" > "VERSION"
-            echo : > "PART"
+            echo "" > "PART"
             git config --local user.email "action@github.com"
             git config --local user.name "GitHub Action"
             git add VERSION
